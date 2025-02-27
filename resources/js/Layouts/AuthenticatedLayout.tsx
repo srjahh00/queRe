@@ -1,6 +1,6 @@
 import { Link, usePage } from "@inertiajs/react";
 import { useState, PropsWithChildren, ReactNode } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/Components/ui/button";
 import {
     DropdownMenu,
     DropdownMenuContent,

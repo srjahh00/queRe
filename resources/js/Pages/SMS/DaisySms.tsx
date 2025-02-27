@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import DangerButton from "@/Components/DangerButton";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/Components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import {
     Table,

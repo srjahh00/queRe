@@ -1,5 +1,5 @@
 import ApplicationLogo from "@/Components/ApplicationLogo";
-import { Label } from "@/components/ui/label";
+import { Label } from "@/Components/ui/label";
 import { Link } from "@inertiajs/react";
 import { PropsWithChildren } from "react";
 

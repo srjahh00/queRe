@@ -8,7 +8,7 @@ import {
     CardTitle,
 } from "@/Components/ui/card";
 import { Input } from "@/Components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Label } from "@/Components/ui/label";
 import {
     Select,
     SelectContent,
@@ -18,7 +18,7 @@ import {
 } from "@/Components/ui/select";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, router, useForm } from "@inertiajs/react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/Components/ui/button";
 import { useState } from "react";
 import Modal from "@/Components/Modal";
 import { Switch } from "@/Components/ui/switch";
