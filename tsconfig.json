@@ -11,8 +11,9 @@
         "forceConsistentCasingInFileNames": false,
         "skipLibCheck": true,
         "noEmit": true,
+        "baseUrl": "./", // Add baseUrl to make sure the paths are resolved from the root
         "paths": {
-            "@/*": ["./resources/js/*"],
+            "@/*": ["resources/js/*"], // Resolves @ to the resources/js folder
             "ziggy-js": ["./vendor/tightenco/ziggy"]
         }
     },
