@@ -4,16 +4,15 @@
         "module": "ESNext",
         "moduleResolution": "bundler",
         "jsx": "react-jsx",
-        "strict": false,
+        "strict": true,
         "isolatedModules": true,
         "target": "ESNext",
         "esModuleInterop": true,
-        "forceConsistentCasingInFileNames": false,
+        "forceConsistentCasingInFileNames": true,
         "skipLibCheck": true,
         "noEmit": true,
-        "baseUrl": "./", // Add baseUrl to make sure the paths are resolved from the root
         "paths": {
-            "@/*": ["resources/js/*"], // Resolves @ to the resources/js folder
+            "@/*": ["./resources/js/*"],
             "ziggy-js": ["./vendor/tightenco/ziggy"]
         }
     },

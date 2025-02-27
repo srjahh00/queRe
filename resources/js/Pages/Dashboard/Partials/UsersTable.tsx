@@ -20,7 +20,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/Components/ui/table";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
 import { Plus, ArrowUpDown, Calendar } from "lucide-react";
 import { format } from "date-fns";
