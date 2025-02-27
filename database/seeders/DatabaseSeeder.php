@@ -17,12 +17,12 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(5050)->create();
 
-       $user =  User::factory()->create([
+        $user = User::create([
             'name' => 'Test User',
             'email' => 'admin@admin.com',
-            'allow_login' => true,
+            'email_verified_at' => now(),
+            'password' => 'PCGpp00##',
         ]);
-
 
         $environment = Environment::create([
             'name' => 'Emilia',
