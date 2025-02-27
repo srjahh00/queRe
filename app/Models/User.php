@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Carbon;
 
 class User extends Authenticatable
 {
@@ -21,6 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'allow_login'
     ];
 
     /**
@@ -41,8 +43,29 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
+            'allow_login' =>'boolean',
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    // public function getCreatedAtAttribute($value){
+    //     return Carbon::parse($value)->format('M d Y'); 
+    // }
+
+    public function environments(){
+        return $this->hasMany(EnvironmentAssignment::class);
+    }
+
+    public function CurrentEnvironment(){
+        return $this->environment()->only(['name','key']);
+    }
+
+    public function sms(){
+        return $this->hasMany(Sms::class);
+    }
+
+    public function activeSms(){
+        return $this->sms()->latest('created_at');
     }
 }

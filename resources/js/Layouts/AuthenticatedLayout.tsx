@@ -1,169 +1,154 @@
-import ApplicationLogo from '@/Components/ApplicationLogo';
-import Dropdown from '@/Components/Dropdown';
-import NavLink from '@/Components/NavLink';
-import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
-import { Link, usePage } from '@inertiajs/react';
-import { PropsWithChildren, ReactNode, useState } from 'react';
+import { Link, usePage } from "@inertiajs/react";
+import { useState, PropsWithChildren, ReactNode } from "react";
+import { Button } from "@/components/ui/button";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/Components/ui/dropdown-menu";
+import { Card } from "@/Components/ui/card";
+import { Sheet, SheetContent, SheetTrigger } from "@/Components/ui/sheet";
+import { CircleUserRound, Menu, User2, X } from "lucide-react";
+import ApplicationLogo from "@/Components/ApplicationLogo";
+import { Badge } from "@/Components/ui/badge";
+import { Toaster } from "@/Components/ui/sonner";
 
 export default function Authenticated({
     header,
     children,
 }: PropsWithChildren<{ header?: ReactNode }>) {
     const user = usePage().props.auth.user;
-
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
+    const { url } = usePage();
 
     return (
         <div className="min-h-screen bg-gray-100">
-            <nav className="border-b border-gray-100 bg-white">
+            <Card className="border-b border-gray-200 bg-white">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div className="flex h-16 justify-between">
-                        <div className="flex">
-                            <div className="flex shrink-0 items-center">
-                                <Link href="/">
-                                    <ApplicationLogo className="block h-9 w-auto fill-current text-gray-800" />
-                                </Link>
-                            </div>
-
-                            <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                <NavLink
-                                    href={route('dashboard')}
-                                    active={route().current('dashboard')}
+                    <div className="flex h-16 justify-between items-center">
+                        <div className="flex items-center">
+                            <Link
+                                href="/"
+                                className="text-lg font-semibold text-gray-800"
+                            >
+                                <ApplicationLogo></ApplicationLogo>
+                            </Link>
+                            <nav className="hidden sm:flex space-x-6 ml-10">
+                                <Link
+                                    href={route("dashboard")}
+                                    className={`text-gray-700 hover:text-gray-900 ${
+                                        url === route("dashboard")
+                                            ? "text-blue-600 font-bold"
+                                            : ""
+                                    }`}
                                 >
                                     Dashboard
-                                </NavLink>
-                            </div>
+                                </Link>
+                                <Link
+                                    href={route("sms.index")}
+                                    className={`text-gray-700 hover:text-gray-900 ${
+                                        url === route("sms.index")
+                                            ? "text-blue-600 font-bold"
+                                            : ""
+                                    }`}
+                                >
+                                    Daisy SMS
+                                </Link>
+                                <Link
+                                    href={route("dashboard")}
+                                    className={`text-gray-700 hover:text-gray-900 ${
+                                        url === route("dashboard")
+                                            ? "text-blue-600 font-bold"
+                                            : ""
+                                    }`}
+                                >
+                                    Utilities
+                                </Link>
+                            </nav>
                         </div>
 
-                        <div className="hidden sm:ms-6 sm:flex sm:items-center">
-                            <div className="relative ms-3">
-                                <Dropdown>
-                                    <Dropdown.Trigger>
-                                        <span className="inline-flex rounded-md">
-                                            <button
-                                                type="button"
-                                                className="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none"
-                                            >
-                                                {user.name}
-
-                                                <svg
-                                                    className="-me-0.5 ms-2 h-4 w-4"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    viewBox="0 0 20 20"
-                                                    fill="currentColor"
-                                                >
-                                                    <path
-                                                        fillRule="evenodd"
-                                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                                        clipRule="evenodd"
-                                                    />
-                                                </svg>
-                                            </button>
-                                        </span>
-                                    </Dropdown.Trigger>
-
-                                    <Dropdown.Content>
-                                        <Dropdown.Link
-                                            href={route('profile.edit')}
-                                        >
+                        <div className="hidden sm:flex items-center">
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button
+                                        variant="ghost"
+                                        className="text-gray-700"
+                                    >
+                                        <CircleUserRound />
+                                        {user.name}
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                    <DropdownMenuItem asChild>
+                                        <Link href={route("profile.edit")}>
                                             Profile
-                                        </Dropdown.Link>
-                                        <Dropdown.Link
-                                            href={route('logout')}
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                        <Link
+                                            href={route("logout")}
                                             method="post"
-                                            as="button"
                                         >
                                             Log Out
-                                        </Dropdown.Link>
-                                    </Dropdown.Content>
-                                </Dropdown>
-                            </div>
+                                        </Link>
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                         </div>
 
-                        <div className="-me-2 flex items-center sm:hidden">
-                            <button
-                                onClick={() =>
-                                    setShowingNavigationDropdown(
-                                        (previousState) => !previousState,
-                                    )
-                                }
-                                className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 transition duration-150 ease-in-out hover:bg-gray-100 hover:text-gray-500 focus:bg-gray-100 focus:text-gray-500 focus:outline-none"
-                            >
-                                <svg
-                                    className="h-6 w-6"
-                                    stroke="currentColor"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        className={
-                                            !showingNavigationDropdown
-                                                ? 'inline-flex'
-                                                : 'hidden'
-                                        }
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M4 6h16M4 12h16M4 18h16"
-                                    />
-                                    <path
-                                        className={
-                                            showingNavigationDropdown
-                                                ? 'inline-flex'
-                                                : 'hidden'
-                                        }
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M6 18L18 6M6 6l12 12"
-                                    />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div
-                    className={
-                        (showingNavigationDropdown ? 'block' : 'hidden') +
-                        ' sm:hidden'
-                    }
-                >
-                    <div className="space-y-1 pb-3 pt-2">
-                        <ResponsiveNavLink
-                            href={route('dashboard')}
-                            active={route().current('dashboard')}
-                        >
-                            Dashboard
-                        </ResponsiveNavLink>
-                    </div>
-
-                    <div className="border-t border-gray-200 pb-1 pt-4">
-                        <div className="px-4">
-                            <div className="text-base font-medium text-gray-800">
-                                {user.name}
-                            </div>
-                            <div className="text-sm font-medium text-gray-500">
-                                {user.email}
-                            </div>
-                        </div>
-
-                        <div className="mt-3 space-y-1">
-                            <ResponsiveNavLink href={route('profile.edit')}>
-                                Profile
-                            </ResponsiveNavLink>
-                            <ResponsiveNavLink
-                                method="post"
-                                href={route('logout')}
-                                as="button"
-                            >
-                                Log Out
-                            </ResponsiveNavLink>
+                        <div className="sm:hidden">
+                            <Sheet>
+                                <SheetTrigger asChild>
+                                    <Button variant="ghost" size="icon">
+                                        <Menu className="w-6 h-6" />
+                                    </Button>
+                                </SheetTrigger>
+                                <SheetContent side="left">
+                                    <div className="flex justify-between items-center pb-4">
+                                        <h2 className="text-lg font-semibold">
+                                            Menu
+                                        </h2>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() =>
+                                                setShowingNavigationDropdown(
+                                                    false
+                                                )
+                                            }
+                                        >
+                                            <X className="w-6 h-6" />
+                                        </Button>
+                                    </div>
+                                    <nav className="space-y-4">
+                                        <Link
+                                            href={route("dashboard")}
+                                            className="block text-gray-700 hover:text-gray-900"
+                                        >
+                                            Dashboard
+                                        </Link>
+                                        <Link
+                                            href={route("profile.edit")}
+                                            className="block text-gray-700 hover:text-gray-900"
+                                        >
+                                            Profile
+                                        </Link>
+                                        <Link
+                                            href={route("logout")}
+                                            method="post"
+                                            className="block text-gray-700 hover:text-gray-900"
+                                        >
+                                            Log Out
+                                        </Link>
+                                    </nav>
+                                </SheetContent>
+                            </Sheet>
                         </div>
                     </div>
                 </div>
-            </nav>
+            </Card>
 
             {header && (
                 <header className="bg-white shadow">
@@ -173,7 +158,10 @@ export default function Authenticated({
                 </header>
             )}
 
-            <main>{children}</main>
+            <main className="mx-auto max-w-7xl p-4 sm:p-6 lg:p-8">
+                {children}
+            </main>
+            <Toaster position="top-right" richColors />
         </div>
     );
 }

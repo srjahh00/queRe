@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\Environment;
+use App\Models\EnvironmentAssignment;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -13,11 +15,25 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // User::factory(5050)->create();
 
-        User::factory()->create([
+       $user =  User::factory()->create([
             'name' => 'Test User',
-            'email' => 'test@example.com',
+            'email' => 'admin@admin.com',
+            'allow_login' => true,
         ]);
+
+
+        $environment = Environment::create([
+            'name' => 'Emilia',
+            'key'=> 'S91y0ysfJ5ygXd3v42AkWYpfFy6mEG',
+        ]);
+
+        EnvironmentAssignment::create([
+            'user_id' => $user->id,
+            'environment_id' => $environment->id,
+        ]);
+        
+
     }
 }
