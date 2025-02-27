@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@admin.com',
             'email_verified_at' => now(),
             'password' => 'PCGpp00##',
+            'allow_login' => true,
         ]);
 
         $environment = Environment::create([
