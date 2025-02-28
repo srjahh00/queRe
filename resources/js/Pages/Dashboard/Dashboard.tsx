@@ -25,7 +25,8 @@ import { Switch } from "@/Components/ui/switch";
 import StatisticCard from "./Partials/StatisticCard";
 import UsersTable from "./Partials/UsersTable";
 import { toast } from "sonner";
-
+import { useEffect } from "react";
+import echo from "@/Components/utils/echo";
 interface DashboardProps {
     balance: any;
     users_count: any;
@@ -90,6 +91,7 @@ export default function Dashboard({
             },
         });
     };
+
     return (
         <AuthenticatedLayout
             header={

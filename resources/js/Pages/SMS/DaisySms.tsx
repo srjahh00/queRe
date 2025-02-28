@@ -12,10 +12,11 @@ import {
     TableRow,
 } from "@/Components/ui/table";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head } from "@inertiajs/react";
+import { Head, usePage } from "@inertiajs/react";
 import { toast } from "sonner";
 import CreateRental from "./Partials/CreateRental";
 import CancelRental from "./Partials/CancelRental";
+import echo from "@/Components/utils/echo";
 
 interface Sms {
     id: any;
@@ -28,24 +29,42 @@ interface Sms {
 }
 
 interface DaisySmsProps {
-    response: any;
+    body: any;
     sms: Sms[];
 }
 
-export default function DaisySms({ sms }: DaisySmsProps) {
+export default function DaisySms({ sms, body }: DaisySmsProps) {
     const [smsList, setSmsList] = useState<Sms[]>(sms);
+    const { auth } = usePage().props;
 
     const fetchSmsList = async () => {
         const response = await fetch(route("sms.sms-data"));
-        const data = await response.json();
+        const data: any[] = await response.json();
+
+        const latestEntry = data.sort(
+            (a, b) =>
+                new Date(b.created_at).getTime() -
+                new Date(a.created_at).getTime()
+        )[0];
+
+        if (latestEntry.user_id === auth.user.id) {
+            toast.success("Code Received! 📩");
+        }
+
         setSmsList(data);
     };
 
-    fetchSmsList();
+    useEffect(() => {
+        const channel = echo.channel("webhook");
 
-    const intervalId = setInterval(fetchSmsList, 3000);
+        channel.listen(".webhook.pushed", (event: any) => {
+            fetchSmsList();
+        });
 
-    clearInterval(intervalId);
+        return () => {
+            channel.unsubscribe();
+        };
+    }, []);
 
     return (
         <AuthenticatedLayout
@@ -59,7 +78,7 @@ export default function DaisySms({ sms }: DaisySmsProps) {
 
             <Card className="w-full p-4">
                 <CardHeader>
-                    <CreateRental />
+                    <CreateRental body={body} />
                 </CardHeader>
                 <CardContent>
                     <Table>

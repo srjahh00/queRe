@@ -82,7 +82,7 @@ class SmsController extends Controller
         ]);
 
         return Inertia::render('SMS/DaisySms',[
-           'response' => $response->body(),
+           'body' => $response->body(),
            'sms'=> Auth::user()->sms()->orderBy('created_at', 'desc')->get() 
         ]);
     }  
