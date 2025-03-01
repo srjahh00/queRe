@@ -22,8 +22,8 @@ class WebhookController extends Controller
             'country' => data_get($data,'country'), 
             'received_at' => data_get($data,'receivedAt'), 
         ]);
-        WebhookEntry::dispatch();
-        
-        return $sms;
+        if ($sms) {
+        WebhookEntry::dispatch();        
+    }        
     }
 }

@@ -29,13 +29,17 @@ interface Sms {
 }
 
 interface DaisySmsProps {
-    body: any;
+    message: any;
     sms: Sms[];
 }
 
-export default function DaisySms({ sms, body }: DaisySmsProps) {
+export default function DaisySms({ sms, message }: DaisySmsProps) {
     const [smsList, setSmsList] = useState<Sms[]>(sms);
     const { auth } = usePage().props;
+
+    useEffect(() => {
+        setSmsList(sms);
+    }, [sms]);
 
     const fetchSmsList = async () => {
         const response = await fetch(route("sms.sms-data"));
@@ -66,6 +70,12 @@ export default function DaisySms({ sms, body }: DaisySmsProps) {
         };
     }, []);
 
+    useEffect(() => {
+        if (message !== "") {
+            toast.info(message);
+        }
+    }, [message]);
+
     return (
         <AuthenticatedLayout
             header={
@@ -78,7 +88,7 @@ export default function DaisySms({ sms, body }: DaisySmsProps) {
 
             <Card className="w-full p-4">
                 <CardHeader>
-                    <CreateRental body={body} />
+                    <CreateRental />
                 </CardHeader>
                 <CardContent>
                     <Table>

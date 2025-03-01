@@ -15,7 +15,7 @@ import { SendHorizonalIcon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-export default function CreateRental({ body }: any) {
+export default function CreateRental() {
     const [open, setOpen] = useState(false);
     const { data, setData, post, errors } = useForm({
         areaCode: "",
@@ -27,7 +27,6 @@ export default function CreateRental({ body }: any) {
         post(route("sms.store"), {
             onSuccess: () => {
                 setOpen(false);
-                toast.info(body);
             },
             onError: (errors: any) => {
                 toast.error(errors.message || "An error occurred.");
