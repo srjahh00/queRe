@@ -13,6 +13,7 @@ import { CircleUserRound, Menu, User2, X } from "lucide-react";
 import ApplicationLogo from "@/Components/ApplicationLogo";
 import { Badge } from "@/Components/ui/badge";
 import { Toaster } from "@/Components/ui/sonner";
+import ShoutListener from "@/Pages/Shout/Shout";
 
 export default function Authenticated({
     header,
@@ -159,6 +160,7 @@ export default function Authenticated({
             )}
 
             <main className="mx-auto max-w-7xl p-4 sm:p-6 lg:p-8">
+                <ShoutListener />
                 {children}
             </main>
             <Toaster position="top-right" richColors />

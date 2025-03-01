@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\Shout;
 use App\Events\WebhookEntry;
 use App\Models\Sms;
 use Illuminate\Http\Request;
@@ -25,5 +26,12 @@ class WebhookController extends Controller
         if ($sms) {
         WebhookEntry::dispatch();        
     }        
+    }
+    public function sendShout(Request $request)
+    {
+        $message = $request->input('message', 'Default shout message');
+        Shout::dispatch($message);
+        
+        return response()->json(['status' => 'Shout sent!', 'message' => $message]);
     }
 }

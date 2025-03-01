@@ -35,5 +35,6 @@ Route::middleware('auth')->group(function () {
 
 });
 Route::post('/webhook', [WebhookController::class, 'handleWebhook'])->withoutMiddleware([VerifyCsrfToken::class]);
+Route::post('/shout', [WebhookController::class, 'sendShout'])->withoutMiddleware([VerifyCsrfToken::class]);
 
 require __DIR__ . '/auth.php';
