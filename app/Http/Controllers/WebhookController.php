@@ -9,7 +9,7 @@ use Log;
 
 class WebhookController extends Controller
 {
-    public function handleWebhook(Request $request): void{
+    public function handleWebhook(Request $request){
     
         $data = $request->all();
         
