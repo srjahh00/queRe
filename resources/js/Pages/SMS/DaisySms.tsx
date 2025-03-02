@@ -113,8 +113,23 @@ export default function DaisySms({ sms, message }: DaisySmsProps) {
                                 <TableRow key={message.rental_id}>
                                     <TableCell>{message.rental_id}</TableCell>
                                     <TableCell>
-                                        {message.rental_number}
+                                        <span
+                                            style={{
+                                                fontWeight: "bold",
+                                                color: "gray",
+                                                userSelect: "none",
+                                            }}
+                                        >
+                                            +1
+                                        </span>{" "}
+                                        {message.rental_number
+                                            .slice(1)
+                                            .replace(
+                                                /(\d{3})(\d{3})(\d{4})/,
+                                                "$1$2$3"
+                                            )}
                                     </TableCell>
+
                                     <TableCell>
                                         {message.service ?? " "}
                                     </TableCell>
