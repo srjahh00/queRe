@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EnvironmentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SmsController;
 use App\Http\Controllers\UserController;
@@ -32,6 +33,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/sms/{sms}/cancel', [SmsController::class, 'cancelRental'])->name('sms.cancel');
     Route::resource('sms', SmsController::class);
     Route::resource('users', UserController::class);
+    Route::resource('environments', EnvironmentController::class);
 
 });
 Route::post('/webhook', [WebhookController::class, 'handleWebhook'])->withoutMiddleware([VerifyCsrfToken::class]);

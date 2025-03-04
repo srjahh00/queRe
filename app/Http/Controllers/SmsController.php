@@ -15,13 +15,16 @@ class SmsController extends Controller
 
     public function __construct(Request $request)
     {
-        $this->environment = $request->user()->environments()->first()->environment;
+        $this->environment = $request->user()->environments()->first()->environment ?? null;
     }
 
     public function index(Request $request)
     {
+        $environmentKeyMissing = is_null($this->environment); // Check if environment key is missing
+
         return Inertia::render('SMS/DaisySms', [
-            'sms' => Auth::user()->sms()->orderBy('created_at', 'desc')->get(), 
+            'sms' => Auth::user()->sms()->orderBy('created_at', 'desc')->get(),
+            'environmentKeyMissing' => $environmentKeyMissing, 
         ]);
     }
 
@@ -78,7 +81,8 @@ class SmsController extends Controller
             'id' => data_get($request,'rental_id'),
             'status' => '8',
         ]);
-
+        $sms = Sms::where('rental_id',data_get($request,'rental_id'));
+        $sms->delete();
         return Inertia::render('SMS/DaisySms',[
            'message' => $response->body(),
            'sms'=> Auth::user()->sms()->orderBy('created_at', 'desc')->get() 

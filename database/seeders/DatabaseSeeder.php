@@ -7,6 +7,7 @@ use App\Models\EnvironmentAssignment;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Role;
 
 class DatabaseSeeder extends Seeder
 {
@@ -15,11 +16,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(5050)->create();
-
+        self::call([
+            RolesAndPermissionSeeder::class 
+         ]);
+         
         $user = User::create([
-            'name' => 'Test User',
-            'email' => 'admin@admin.com',
+            'name' => 'Admin',
+            'email' => 'jhay@admin.com',
             'email_verified_at' => now(),
             'password' => 'PCGpp00##',
             'allow_login' => true,
@@ -35,6 +38,12 @@ class DatabaseSeeder extends Seeder
             'environment_id' => $environment->id,
         ]);
         
+        $superAdminRole = Role::where('name', 'super admin')->first();
 
+        // If the 'super admin' role exists, assign it to the user
+        if ($superAdminRole) {
+            $user->assignRole(data_get($superAdminRole,'name'));
+        }
+      
     }
 }

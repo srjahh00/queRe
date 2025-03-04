@@ -7,6 +7,7 @@ use App\Models\User;
 use Http;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Spatie\Permission\Models\Role;
 
 class DashboardController extends Controller
 {
@@ -18,7 +19,8 @@ class DashboardController extends Controller
         return Inertia::render('Dashboard/Dashboard',[
             'balance' => $this->getBalance(),
             'users_count' => User::count(),
-            'users' => User::all(),
+            'users' => User::with(['roles','environments.environment'])->get(),
+            'roles' => Role::where('name', '!=', 'super admin')->get(),
             'environments' => self::getEnvironments()
 
         ]);

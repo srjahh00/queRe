@@ -14,6 +14,7 @@ import ApplicationLogo from "@/Components/ApplicationLogo";
 import { Badge } from "@/Components/ui/badge";
 import { Toaster } from "@/Components/ui/sonner";
 import ShoutListener from "@/Pages/Shout/Shout";
+import { getPermissions } from "@/Components/utils/permissions";
 
 export default function Authenticated({
     header,
@@ -23,7 +24,8 @@ export default function Authenticated({
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
     const { url } = usePage();
-
+    const roles = usePage().props.auth.roles;
+    const { hasPermission } = getPermissions(roles);
     return (
         <div className="min-h-screen bg-gray-100">
             <Card className="border-b border-gray-200 bg-white">
@@ -67,6 +69,18 @@ export default function Authenticated({
                                 >
                                     Utilities
                                 </Link>
+                                {hasPermission("manage environment") && (
+                                    <Link
+                                        href={route("environments.index")}
+                                        className={`text-gray-700 hover:text-gray-900 ${
+                                            url === route("dashboard")
+                                                ? "text-blue-600 font-bold"
+                                                : ""
+                                        }`}
+                                    >
+                                        Environment
+                                    </Link>
+                                )}
                             </nav>
                         </div>
 

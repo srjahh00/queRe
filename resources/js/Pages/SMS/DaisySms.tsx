@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import CreateRental from "./Partials/CreateRental";
 import CancelRental from "./Partials/CancelRental";
 import echo from "@/Components/utils/echo";
+import { Badge } from "@/Components/ui/badge";
 
 interface Sms {
     id: any;
@@ -31,12 +32,30 @@ interface Sms {
 interface DaisySmsProps {
     message: any;
     sms: Sms[];
+    environmentKeyMissing: any;
 }
 
-export default function DaisySms({ sms, message }: DaisySmsProps) {
+export default function DaisySms({
+    sms,
+    message,
+    environmentKeyMissing,
+}: DaisySmsProps) {
     const [smsList, setSmsList] = useState<Sms[]>(sms);
     const { auth } = usePage().props;
+    useEffect(() => {
+        if (message && message.trim() !== "") {
+            // Check for non-null and non-empty message
+            toast.info(message);
+        }
+    }, [message]);
 
+    useEffect(() => {
+        if (environmentKeyMissing) {
+            toast.error(
+                "No environment key assigned! Please contact administrator to assign your key ✌️✌️"
+            );
+        }
+    }, [environmentKeyMissing]);
     useEffect(() => {
         setSmsList(sms);
     }, [sms]);
@@ -70,12 +89,6 @@ export default function DaisySms({ sms, message }: DaisySmsProps) {
         };
     }, []);
 
-    useEffect(() => {
-        if (message !== "") {
-            toast.info(message);
-        }
-    }, [message]);
-
     return (
         <AuthenticatedLayout
             header={
@@ -88,7 +101,11 @@ export default function DaisySms({ sms, message }: DaisySmsProps) {
 
             <Card className="w-full p-4">
                 <CardHeader>
-                    <CreateRental />
+                    {environmentKeyMissing ? (
+                        <Badge variant="destructive">No key assigned!</Badge>
+                    ) : (
+                        <CreateRental />
+                    )}{" "}
                 </CardHeader>
                 <CardContent>
                     <Table>

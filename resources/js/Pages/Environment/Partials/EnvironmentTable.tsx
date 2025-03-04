@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import {
     ColumnDef,
@@ -23,33 +21,31 @@ import {
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
 import { Plus, ArrowUpDown, Calendar } from "lucide-react";
-import { format } from "date-fns";
 import { Checkbox } from "@/Components/ui/checkbox";
-import UpdateUser from "./UpdateUser";
-
-interface User {
-    id: number;
-    name: string;
-    email: string;
-    created_at: string;
-    roles: { name: string }[]; // An array of role objects with a name property
-    role: string; // Assuming `role` is a string
-    environments: any;
-    environment: any;
-}
-
-export default function UsersTable({
-    users,
-    users_count,
-    openModal,
+import CreateEnvironment from "./CreateEnvironment";
+import DeleteEnvironment from "./DeleteEnvironment";
+import UpdateEnvironment from "./UpdateEnvironment";
+export default function EnvironmentTable({
+    environments,
 }: {
-    users: User[];
-    users_count: number;
-    openModal: () => void;
+    environments: any;
 }) {
-    const [data] = useState(users);
+    const [data] = useState(environments);
     const [globalFilter, setGlobalFilter] = useState("");
-    const columns: ColumnDef<User>[] = [
+    const columns: ColumnDef<any>[] = [
+        {
+            accessorKey: "id",
+            header: ({ column }) => (
+                <Button
+                    variant="ghost"
+                    onClick={() =>
+                        column.toggleSorting(column.getIsSorted() === "asc")
+                    }
+                >
+                    ID <ArrowUpDown size={16} />
+                </Button>
+            ),
+        },
         {
             accessorKey: "name",
             header: ({ column }) => (
@@ -59,12 +55,12 @@ export default function UsersTable({
                         column.toggleSorting(column.getIsSorted() === "asc")
                     }
                 >
-                    Name <ArrowUpDown size={16} />
+                    name <ArrowUpDown size={16} />
                 </Button>
             ),
         },
         {
-            accessorKey: "email",
+            accessorKey: "key",
             header: ({ column }) => (
                 <Button
                     variant="ghost"
@@ -72,46 +68,7 @@ export default function UsersTable({
                         column.toggleSorting(column.getIsSorted() === "asc")
                     }
                 >
-                    Email <ArrowUpDown size={16} />
-                </Button>
-            ),
-        },
-        {
-            accessorKey: "roles",
-            header: ({ column }) => (
-                <Button
-                    variant="ghost"
-                    onClick={() =>
-                        column.toggleSorting(column.getIsSorted() === "asc")
-                    }
-                >
-                    Roles <ArrowUpDown size={16} />
-                </Button>
-            ),
-        },
-        {
-            accessorKey: "environment",
-            header: ({ column }) => (
-                <Button
-                    variant="ghost"
-                    onClick={() =>
-                        column.toggleSorting(column.getIsSorted() === "asc")
-                    }
-                >
-                    Environment <ArrowUpDown size={16} />
-                </Button>
-            ),
-        },
-        {
-            accessorKey: "allow_login",
-            header: ({ column }) => (
-                <Button
-                    variant="ghost"
-                    onClick={() =>
-                        column.toggleSorting(column.getIsSorted() === "asc")
-                    }
-                >
-                    Allow Login <ArrowUpDown size={16} />
+                    key <ArrowUpDown size={16} />
                 </Button>
             ),
         },
@@ -130,21 +87,8 @@ export default function UsersTable({
         },
     ];
 
-    // Helper function to format the role name
-    const formatRoleName = (roleName: any): string => {
-        if (!roleName) return "";
-
-        return roleName
-            .split(" ")
-            .map(
-                (word: any) =>
-                    word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-            )
-            .join(" ");
-    };
-
     const table = useReactTable({
-        data: users,
+        data: environments,
         columns,
         state: { globalFilter },
         initialState: {
@@ -161,22 +105,20 @@ export default function UsersTable({
         getPaginationRowModel: getPaginationRowModel(),
         onGlobalFilterChange: setGlobalFilter,
     });
+
     return (
         <Card className="w-full p-4">
+            <CreateEnvironment />
             <CardHeader>
                 <div className="flex items-center  justify-between w-full">
                     <Input
-                        placeholder="Search users..."
+                        placeholder="Search environments..."
                         value={globalFilter ?? ""}
                         onChange={(e) => setGlobalFilter(e.target.value)}
                         className="w-1/3"
                     />
-                    <Button onClick={openModal} className="w-auto">
-                        <Plus size={16} /> Add User
-                    </Button>
                 </div>
             </CardHeader>
-
             <Table className="w-full">
                 <TableHeader>
                     {table.getHeaderGroups().map((headerGroup) => (
@@ -205,55 +147,26 @@ export default function UsersTable({
                             <TableRow key={row.id}>
                                 {row.getVisibleCells().map((cell) => (
                                     <TableCell key={cell.id} className="p-4">
-                                        {/* Check if the column is "created_at" */}
                                         {cell.column.id === "created_at" ? (
-                                            <>
-                                                <div className="flex">
-                                                    <Calendar
-                                                        size={16}
-                                                        className="mr-2 text-gray-500"
-                                                    />
-                                                    {/* Format the created_at date */}
-                                                    {new Intl.DateTimeFormat(
-                                                        "en-US",
-                                                        {
-                                                            month: "short",
-                                                            day: "numeric",
-                                                            year: "numeric",
-                                                        }
-                                                    ).format(
-                                                        new Date(
-                                                            cell.getValue() as string
-                                                        )
-                                                    )}
-                                                </div>
-                                            </>
-                                        ) : cell.column.id === "allow_login" ? (
-                                            <Checkbox
-                                                disabled
-                                                checked={
-                                                    !!(cell.getValue() as boolean)
-                                                }
-                                            />
-                                        ) : cell.column.id === "roles" ? (
-                                            <span>
-                                                {row.original.roles?.[0]?.name
-                                                    ? formatRoleName(
-                                                          row.original.roles[0]
-                                                              .name
-                                                      )
-                                                    : "No role"}
-                                            </span>
-                                        ) : cell.column.id === "environment" ? (
-                                            <span>
-                                                {row.original.environments
-                                                    ?.environment?.name
-                                                    ? row.original.environments
-                                                          .environment.name
-                                                    : "No environment"}
-                                            </span>
+                                            <div className="flex">
+                                                <Calendar
+                                                    size={16}
+                                                    className="mr-2 text-gray-500"
+                                                />
+                                                {new Intl.DateTimeFormat(
+                                                    "en-US",
+                                                    {
+                                                        month: "short",
+                                                        day: "numeric",
+                                                        year: "numeric",
+                                                    }
+                                                ).format(
+                                                    new Date(
+                                                        cell.getValue() as string
+                                                    )
+                                                )}
+                                            </div>
                                         ) : (
-                                            // Default rendering for other columns
                                             flexRender(
                                                 cell.column.columnDef.cell,
                                                 cell.getContext()
@@ -263,7 +176,12 @@ export default function UsersTable({
                                 ))}
                                 <TableCell className="p-4">
                                     <div className="flex">
-                                        <UpdateUser user={row.original} />
+                                        <UpdateEnvironment
+                                            environment={row.original}
+                                        />
+                                        <DeleteEnvironment
+                                            id={row.original.id}
+                                        />
                                     </div>
                                 </TableCell>
                             </TableRow>

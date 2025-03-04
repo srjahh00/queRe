@@ -12,12 +12,14 @@ import { Label } from "@/Components/ui/label";
 import {
     Select,
     SelectContent,
+    SelectGroup,
     SelectItem,
+    SelectLabel,
     SelectTrigger,
     SelectValue,
 } from "@/Components/ui/select";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, router, useForm } from "@inertiajs/react";
+import { Head, router, useForm, usePage } from "@inertiajs/react";
 import { Button } from "@/Components/ui/button";
 import { useState } from "react";
 import Modal from "@/Components/Modal";
@@ -27,10 +29,12 @@ import UsersTable from "./Partials/UsersTable";
 import { toast } from "sonner";
 import { useEffect } from "react";
 import echo from "@/Components/utils/echo";
+import { getPermissions } from "@/Components/utils/permissions";
 interface DashboardProps {
     balance: any;
     users_count: any;
     users: any;
+    roles: any;
     environments: any;
 }
 
@@ -39,21 +43,24 @@ export default function Dashboard({
     users_count,
     users: initialUsers,
     environments,
+    roles,
 }: DashboardProps) {
+    const userRoles = usePage().props.auth.roles;
+    const { hasPermission } = getPermissions(userRoles);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [users, setUsers] = useState<any[]>(initialUsers);
     const openModal = () => {
         setIsModalOpen(true);
     };
-
     const closeModal = () => {
         setIsModalOpen(false);
     };
-
     const { data, setData, post, errors, reset } = useForm({
         name: "",
         email: "",
         allow_login: false,
+        role: "",
+        environment_id: "",
     });
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,6 +68,18 @@ export default function Dashboard({
         setData((prevData: any) => ({
             ...prevData,
             [name]: type === "checkbox" ? checked : value,
+        }));
+    };
+    const handleDropdownRole = (value: string) => {
+        setData((prevData: any) => ({
+            ...prevData,
+            role: value,
+        }));
+    };
+    const handleDropDownEnvironment = (value: string) => {
+        setData((prevData: any) => ({
+            ...prevData,
+            environment_id: value,
         }));
     };
 
@@ -85,13 +104,13 @@ export default function Dashboard({
                 closeModal();
                 toast.success("User Created Successfully!");
                 fetchUsers();
+                reset();
             },
             onError: (errors: any) => {
                 console.log("Error updating profile", errors);
             },
         });
     };
-
     return (
         <AuthenticatedLayout
             header={
@@ -105,11 +124,26 @@ export default function Dashboard({
             {/* Grid container for cards */}
             <StatisticCard balance={balance} users_count={users_count} />
             <br />
-            <UsersTable
-                users={users}
-                users_count={users_count}
-                openModal={openModal}
-            />
+            {hasPermission("manage user") ? (
+                <UsersTable
+                    users={users}
+                    users_count={users_count}
+                    openModal={openModal}
+                />
+            ) : (
+                <div
+                    style={{
+                        filter: "blur(5px)", // Apply the blur effect
+                        pointerEvents: "none", // Disable interactions with the component
+                    }}
+                >
+                    <UsersTable
+                        users={users}
+                        users_count={users_count}
+                        openModal={openModal}
+                    />
+                </div>
+            )}
 
             <Modal show={isModalOpen} onClose={closeModal}>
                 <Card className="w-full">
@@ -155,6 +189,61 @@ export default function Dashboard({
                                         </span>
                                     )}
                                 </div>
+                                <div className="flex flex-col space-y-1.5">
+                                    <Label htmlFor="role">Role</Label>
+
+                                    <Select
+                                        value={data.role}
+                                        onValueChange={handleDropdownRole}
+                                    >
+                                        <SelectTrigger id="role">
+                                            <SelectValue placeholder="Select Role" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                {roles.map((role: any) => (
+                                                    <SelectItem
+                                                        key={role.id}
+                                                        value={role.name}
+                                                    >
+                                                        {role.name}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="flex flex-col space-y-1.5">
+                                    <Label htmlFor="role">Environment</Label>
+
+                                    <Select
+                                        value={data.environment_id} // Ensure it's storing ID, not name
+                                        onValueChange={
+                                            handleDropDownEnvironment
+                                        }
+                                    >
+                                        <SelectTrigger id="role">
+                                            <SelectValue placeholder="Select Environment" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                {environments.map(
+                                                    (environment: any) => (
+                                                        <SelectItem
+                                                            key={environment.id}
+                                                            value={String(
+                                                                environment.id
+                                                            )} // Ensure value is a string
+                                                        >
+                                                            {environment.name}
+                                                        </SelectItem>
+                                                    )
+                                                )}
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
                                 <div className="flex flex-col space-y-1.5">
                                     <Label htmlFor="status">Allow login?</Label>
                                     <Switch

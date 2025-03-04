@@ -30,7 +30,6 @@ class Environment extends Model
   * @var list<string>
   */
  protected $hidden = [
-    'key'
  ];
 
  /**
@@ -44,6 +43,24 @@ class Environment extends Model
      ];
  }
 
+
+
+ public function usersEnvironments(){
+    return $this->hasMany(EnvironmentAssignment::class);
+ }
+
+//  public function getKeyAttribute($value)
+//  {
+//      $firstPart = substr($value, 0, 2);
+//      $lastPart = substr($value, -3);
+//      $maskedPart = str_repeat('*', strlen($value) - 5);
+     
+//      return $firstPart . $maskedPart . $lastPart;
+//  }
+
  public function getCreatedAtAttribute($value){
      return Carbon::parse($value)->format('M d Y'); 
- }}
+ }
+
+}
+
