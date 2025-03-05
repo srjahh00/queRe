@@ -20,7 +20,7 @@ class DashboardController extends Controller
         return Inertia::render('Dashboard/Dashboard',[
             'balance' => $this->getBalance(),
             'users_count' => User::count(),
-            'sms' =>Sms::whereNotNull('deleted_at')->get(),
+            'sms' =>Sms::whereNotNull('deleted_at')->count(),
             'users' => User::with(['roles','environments.environment'])->get(),
             'roles' => Role::where('name', '!=', 'super admin')->get(),
             'environments' => self::getEnvironments()
