@@ -36,7 +36,7 @@ class RolesAndPermissionSeeder extends Seeder
         $superAdminRole->syncPermissions(Permission::all());
 
         // Admin gets "manage environment" and "sms service"
-        $adminRole->syncPermissions(['manage environment', 'sms service']);
+        $adminRole->syncPermissions(['manage environment', 'sms service', 'manage user']);
 
         // Staff gets only "sms service"
         $staffRole->syncPermissions(['sms service']);
