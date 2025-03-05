@@ -44,7 +44,7 @@ export default function DeleteEnvironment({ id }: { id: any }) {
     };
 
     return (
-        <div className="flex justify-end w-full">
+        <div className="flex justify-end">
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>
                     <Button variant="destructive" onClick={handleOpenDialog}>

@@ -1,7 +1,7 @@
 import { Card } from "@/Components/ui/card";
 import { Mail, Users } from "lucide-react";
 
-export default function StatisticCard({ balance, users_count }: any) {
+export default function StatisticCard({ balance, users_count, sms }: any) {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <Card className="w-full">
@@ -26,7 +26,7 @@ export default function StatisticCard({ balance, users_count }: any) {
                             Total users
                         </p>
                         <p className="text-sm text-muted-foreground">
-                            {users_count}
+                            {users_count ?? 0}
                         </p>
                     </div>
                 </div>
@@ -37,10 +37,11 @@ export default function StatisticCard({ balance, users_count }: any) {
                     <Mail />
                     <div className="flex-1 space-y-1">
                         <p className="text-sm font-medium leading-none">
-                            {" "}
-                            TBC - WALA MUNA
+                            Total SMS Request
                         </p>
-                        <p className="text-sm text-muted-foreground">xxx</p>
+                        <p className="text-sm text-muted-foreground">
+                            {sms ?? 0}{" "}
+                        </p>
                     </div>
                 </div>
             </Card>

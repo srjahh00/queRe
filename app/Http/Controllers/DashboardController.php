@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Environment;
+use App\Models\Sms;
 use App\Models\User;
 use Http;
 use Illuminate\Http\Request;
@@ -19,6 +20,7 @@ class DashboardController extends Controller
         return Inertia::render('Dashboard/Dashboard',[
             'balance' => $this->getBalance(),
             'users_count' => User::count(),
+            'sms' =>Sms::whereNotNull('deleted_at')->get(),
             'users' => User::with(['roles','environments.environment'])->get(),
             'roles' => Role::where('name', '!=', 'super admin')->get(),
             'environments' => self::getEnvironments()

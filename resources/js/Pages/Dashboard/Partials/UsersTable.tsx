@@ -42,10 +42,14 @@ export default function UsersTable({
     users,
     users_count,
     openModal,
+    roles,
+    environments,
 }: {
     users: User[];
     users_count: number;
     openModal: () => void;
+    roles: any;
+    environments: any;
 }) {
     const [data] = useState(users);
     const [globalFilter, setGlobalFilter] = useState("");
@@ -263,7 +267,11 @@ export default function UsersTable({
                                 ))}
                                 <TableCell className="p-4">
                                     <div className="flex">
-                                        <UpdateUser user={row.original} />
+                                        <UpdateUser
+                                            user={row.original}
+                                            environments={environments}
+                                            roles={roles}
+                                        />
                                     </div>
                                 </TableCell>
                             </TableRow>

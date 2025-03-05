@@ -174,8 +174,9 @@ export default function EnvironmentTable({
                                         )}
                                     </TableCell>
                                 ))}
-                                <TableCell className="p-4">
-                                    <div className="flex">
+                                <TableCell className="centre">
+                                    <div className="flex space-x-4">
+                                        {/* Using space-x-4 to create horizontal spacing */}
                                         <UpdateEnvironment
                                             environment={row.original}
                                         />

@@ -36,6 +36,7 @@ interface DashboardProps {
     users: any;
     roles: any;
     environments: any;
+    sms: any;
 }
 
 export default function Dashboard({
@@ -44,6 +45,7 @@ export default function Dashboard({
     users: initialUsers,
     environments,
     roles,
+    sms,
 }: DashboardProps) {
     const userRoles = usePage().props.auth.roles;
     const { hasPermission } = getPermissions(userRoles);
@@ -122,13 +124,19 @@ export default function Dashboard({
             <Head title="Dashboard" />
 
             {/* Grid container for cards */}
-            <StatisticCard balance={balance} users_count={users_count} />
+            <StatisticCard
+                balance={balance}
+                users_count={users_count}
+                sms={sms}
+            />
             <br />
             {hasPermission("manage user") ? (
                 <UsersTable
                     users={users}
                     users_count={users_count}
                     openModal={openModal}
+                    environments={environments}
+                    roles={roles}
                 />
             ) : (
                 <div
@@ -141,6 +149,8 @@ export default function Dashboard({
                         users={users}
                         users_count={users_count}
                         openModal={openModal}
+                        environments={environments}
+                        roles={roles}
                     />
                 </div>
             )}
