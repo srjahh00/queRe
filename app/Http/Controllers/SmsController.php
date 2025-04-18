@@ -20,7 +20,7 @@ class SmsController extends Controller
 
     public function index(Request $request)
     {
-        $environmentKeyMissing = is_null($this->environment); // Check if environment key is missing
+        $environmentKeyMissing = is_null($this->environment); 
 
         return Inertia::render('SMS/DaisySms', [
             'sms' => Auth::user()->sms()->orderBy('created_at', 'desc')->get(),
@@ -35,11 +35,18 @@ class SmsController extends Controller
 
     public function store(Request $request)
     {
+        $auth = $request->user();
+
+        $userEnvironmentKey = $auth->environments->environment->key;
+        if (!$userEnvironmentKey) {
+            return back()->withErrors(['errors' => 'No Environment Key Assigned!']);
+        }
+        
         $validated = $request->validate([
             'areaCode' => ['required', 'string'],
         ]);
         $response = Http::get("https://daisysms.com/stubs/handler_api.php", [
-            'api_key' => 'S91y0ysfJ5ygXd3v42AkWYpfFy6mEG',
+            'api_key' => $userEnvironmentKey,
             'action' => 'getNumber',
             'service' => 'oi',
             'max_price'=> '0.60',
