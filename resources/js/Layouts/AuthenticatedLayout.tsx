@@ -59,7 +59,7 @@ export default function Authenticated({
                                 >
                                     Daisy SMS
                                 </Link>
-                                <Link
+                                {/* <Link
                                     href={route("dashboard")}
                                     className={`text-gray-700 hover:text-gray-900 ${
                                         url === route("dashboard")
@@ -68,7 +68,7 @@ export default function Authenticated({
                                     }`}
                                 >
                                     Utilities
-                                </Link>
+                                </Link> */}
                                 {hasPermission("manage environment") && (
                                     <Link
                                         href={route("environments.index")}
