@@ -112,7 +112,8 @@ export default function DaisySms({
                 <CardContent>
                     <Table>
                         <TableCaption>
-                            A list of your recent invoices.
+                            &copy; 2025 Tindre Dayz. Developed by{" "}
+                            <strong>@srJhayRamirez</strong>.
                         </TableCaption>
                         <TableHeader>
                             <TableRow>
