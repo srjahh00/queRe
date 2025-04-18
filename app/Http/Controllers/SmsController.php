@@ -34,15 +34,13 @@ class SmsController extends Controller
     
 
     public function store(Request $request)
-    {
-        $auth = $request->user();
-
-        $userEnvironmentKey = $auth->environments->environment->key;    
+    {  
         $validated = $request->validate([
             'areaCode' => ['required', 'string'],
         ]);
+        // dd($this->environment->key);
         $response = Http::get("https://daisysms.com/stubs/handler_api.php", [
-            'api_key' => $userEnvironmentKey,
+            'api_key' => $this->environment->key,
             'action' => 'getNumber',
             'service' => 'oi',
             'max_price'=> '0.60',
