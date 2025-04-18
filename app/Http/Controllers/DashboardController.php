@@ -16,28 +16,39 @@ class DashboardController extends Controller
 
     }
 
-    public function index(){
-        return Inertia::render('Dashboard/Dashboard',[
-            'balance' => $this->getBalance(),
+    public function index()
+    {
+        return Inertia::render('Dashboard/Dashboard', [
+            'balance' => $this->getBalances(), // ← now returns array
             'users_count' => User::count(),
-            'sms' =>Sms::whereNotNull('deleted_at')->count(),
-            'users' => User::with(['roles','environments.environment'])->get(),
+            'sms' => Sms::whereNotNull('deleted_at')->count(),
+            'users' => User::with(['roles', 'environments.environment'])->get(),
             'roles' => Role::where('name', '!=', 'super admin')->get(),
             'environments' => self::getEnvironments()
-
         ]);
     }
+    
 
     private function getEnvironments()
     {
         return Environment::select('id', 'name')->get();
     }
     
-
-    public function getBalance()
+    public function getBalances()
     {
-        $apiKey = "S91y0ysfJ5ygXd3v42AkWYpfFy6mEG"; 
-    
+        return Environment::select('name', 'key')
+            ->get()
+            ->map(function ($env) {
+                return [
+                    'name' => $env->name,
+                    'balance' => $this->getBalance($env->key),
+                ];
+            });
+    }
+
+    public function getBalance($apiKey)
+    {
+        
         $response = Http::get("https://daisysms.com/stubs/handler_api.php", [
             'api_key' => $apiKey,
             'action' => 'getBalance',
@@ -46,10 +57,12 @@ class DashboardController extends Controller
         $body = $response->body();
     
         if (str_contains($body, 'ACCESS_BALANCE')) {
-            return explode(':', $body)[1]; 
+            return explode(':', $body)[1];
         } elseif (str_contains($body, 'BAD_KEY')) {
             return "Invalid API Key!";
         }
+    
         return "[ERROR] Faulty API - Check with Administrator";
     }
+    
 }

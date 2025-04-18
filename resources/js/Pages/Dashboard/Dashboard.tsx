@@ -114,6 +114,8 @@ export default function Dashboard({
             },
         });
     };
+
+    console.log(balance);
     return (
         <AuthenticatedLayout
             header={
