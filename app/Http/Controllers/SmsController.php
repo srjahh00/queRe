@@ -39,7 +39,7 @@ class SmsController extends Controller
             'areaCode' => ['required', 'string'],
         ]);
         $response = Http::get("https://daisysms.com/stubs/handler_api.php", [
-            'api_key' => $this->environment->key,
+            'api_key' => 'S91y0ysfJ5ygXd3v42AkWYpfFy6mEG',
             'action' => 'getNumber',
             'service' => 'oi',
             'max_price'=> '0.60',
@@ -64,12 +64,7 @@ class SmsController extends Controller
                     'rental_number' => $rentalNumber,  
                 ]);
             }
-        }
-        
-        return Inertia::render('SMS/DaisySms', [
-            'message' => $response,
-            'sms' => Auth::user()->sms()->orderBy('created_at', 'desc')->get(), 
-        ]);
+        } 
     }
 
     public function cancelRental($id,Request $request){

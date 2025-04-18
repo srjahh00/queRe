@@ -30,6 +30,7 @@ import { toast } from "sonner";
 import { useEffect } from "react";
 import echo from "@/Components/utils/echo";
 import { getPermissions } from "@/Components/utils/permissions";
+import { error } from "console";
 interface DashboardProps {
     balance: any;
     users_count: any;
@@ -64,6 +65,8 @@ export default function Dashboard({
         role: "",
         environment_id: "",
     });
+
+    console.log(errors);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value, type, checked } = e.target;
@@ -130,7 +133,8 @@ export default function Dashboard({
                 sms={sms}
             />
             <br />
-            {hasPermission("manage user") ? (
+
+            {hasPermission("manage user") && (
                 <UsersTable
                     users={users}
                     users_count={users_count}
@@ -138,21 +142,6 @@ export default function Dashboard({
                     environments={environments}
                     roles={roles}
                 />
-            ) : (
-                <div
-                    style={{
-                        filter: "blur(5px)", // Apply the blur effect
-                        pointerEvents: "none", // Disable interactions with the component
-                    }}
-                >
-                    <UsersTable
-                        users={users}
-                        users_count={users_count}
-                        openModal={openModal}
-                        environments={environments}
-                        roles={roles}
-                    />
-                </div>
             )}
 
             <Modal show={isModalOpen} onClose={closeModal}>

@@ -18,6 +18,7 @@ import CreateRental from "./Partials/CreateRental";
 import CancelRental from "./Partials/CancelRental";
 import echo from "@/Components/utils/echo";
 import { Badge } from "@/Components/ui/badge";
+import { CheckCircle2Icon } from "lucide-react";
 
 interface Sms {
     id: any;
@@ -152,10 +153,14 @@ export default function DaisySms({
                                     </TableCell>
                                     <TableCell>{message.code ?? " "}</TableCell>
                                     <TableCell className="text-right">
-                                        <CancelRental
-                                            rental_id={message.rental_id}
-                                            id={message.id}
-                                        />
+                                        {message.code ? (
+                                            <CheckCircle2Icon />
+                                        ) : (
+                                            <CancelRental
+                                                rental_id={message.rental_id}
+                                                id={message.id}
+                                            />
+                                        )}
                                     </TableCell>
                                 </TableRow>
                             ))}
