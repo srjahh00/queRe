@@ -151,6 +151,12 @@ export default function Authenticated({
                                             Profile
                                         </Link>
                                         <Link
+                                            href={route("sms.index")}
+                                            className="block text-gray-700 hover:text-gray-900"
+                                        >
+                                            Daisy SMS
+                                        </Link>
+                                        <Link
                                             href={route("logout")}
                                             method="post"
                                             className="block text-gray-700 hover:text-gray-900"
