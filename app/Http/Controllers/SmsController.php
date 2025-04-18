@@ -37,11 +37,7 @@ class SmsController extends Controller
     {
         $auth = $request->user();
 
-        $userEnvironmentKey = $auth->environments->environment->key;
-        if (!$userEnvironmentKey) {
-            return back()->withErrors(['errors' => 'No Environment Key Assigned!']);
-        }
-        
+        $userEnvironmentKey = $auth->environments->environment->key;    
         $validated = $request->validate([
             'areaCode' => ['required', 'string'],
         ]);
