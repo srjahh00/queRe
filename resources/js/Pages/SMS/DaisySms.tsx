@@ -43,6 +43,7 @@ export default function DaisySms({
 }: DaisySmsProps) {
     const [smsList, setSmsList] = useState<Sms[]>(sms);
     const { auth } = usePage().props;
+
     useEffect(() => {
         if (message && message.trim() !== "") {
             // Check for non-null and non-empty message

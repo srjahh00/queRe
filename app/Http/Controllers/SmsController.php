@@ -48,7 +48,6 @@ class SmsController extends Controller
         ]);
         
         $response = $response->body();
-      
         if (str_contains($response, 'ACCESS_NUMBER:')) {
             $accessNumber = \Str::between($response, 'ACCESS_NUMBER:', ' ') ?? null;
         
@@ -64,6 +63,8 @@ class SmsController extends Controller
                     'rental_number' => $rentalNumber,  
                 ]);
             }
+        }else{
+            return back()->withErrors(['errors' => $response]);
         } 
     }
 
@@ -78,9 +79,8 @@ class SmsController extends Controller
         ]);
         $sms = Sms::where('rental_id',data_get($request,'rental_id'));
         $sms->delete();
-        return Inertia::render('SMS/DaisySms',[
-           'message' => $response->body(),
-           'sms'=> Auth::user()->sms()->orderBy('created_at', 'desc')->get() 
-        ]);
+        
+        return redirect('/sms')->with('message', $response->body());
+
     }  
 }

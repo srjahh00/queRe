@@ -29,8 +29,7 @@ export default function CreateRental() {
                 setOpen(false);
             },
             onError: (errors: any) => {
-                toast.error(errors.message || "An error occurred.");
-                console.log("Error updating profile", errors);
+                toast.error(errors.errors);
             },
         });
     };

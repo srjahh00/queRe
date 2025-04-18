@@ -66,8 +66,6 @@ export default function Dashboard({
         environment_id: "",
     });
 
-    console.log(errors);
-
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value, type, checked } = e.target;
         setData((prevData: any) => ({
