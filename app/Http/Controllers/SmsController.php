@@ -6,6 +6,7 @@ use App\Models\Sms;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Log;
 
@@ -35,18 +36,25 @@ class SmsController extends Controller
 
     public function store(Request $request)
     {  
+
         $validated = $request->validate([
             'areaCode' => ['required', 'string'],
+            'carriers' => ['required', 'string', Rule::in(['vz', 'tmo', 'none'])],
         ]);
-        // dd($this->environment->key);
-        $response = Http::get("https://daisysms.com/stubs/handler_api.php", [
+        
+        $params = [
             'api_key' => $this->environment->key,
             'action' => 'getNumber',
             'service' => 'oi',
-            'max_price'=> '0.60',
-            'carriers' => 'vz',
-            'areas' => $validated['areaCode']
-        ]);
+            'max_price' => '0.60',
+            'areas' => $validated['areaCode'],
+        ];
+        
+        if ($validated['carriers'] !== 'none') {
+            $params['carriers'] = $validated['carriers'];
+        }
+        
+        $response = Http::get("https://daisysms.com/stubs/handler_api.php", $params);
         
         $response = $response->body();
         if (str_contains($response, 'ACCESS_NUMBER:')) {
@@ -62,6 +70,7 @@ class SmsController extends Controller
                     'environment_id' => $this->environment->id,
                     'rental_id' => $rentalId, 
                     'rental_number' => $rentalNumber,  
+                    'carrier' => data_get($validated,'carriers',null)
                 ]);
             }
         }else{
