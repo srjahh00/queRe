@@ -10,6 +10,15 @@ import {
 } from "@/Components/ui/dialog";
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from "@/Components/ui/select";
 import { useForm, usePage } from "@inertiajs/react";
 import { SendHorizonalIcon } from "lucide-react";
 import { useState } from "react";
@@ -17,8 +26,9 @@ import { toast } from "sonner";
 
 export default function CreateRental() {
     const [open, setOpen] = useState(false);
-    const { data, setData, post, errors } = useForm({
+    const { data, setData, post, errors, processing } = useForm({
         areaCode: "",
+        carriers: "",
     });
 
     const handleSend = (e: React.FormEvent) => {
@@ -29,6 +39,7 @@ export default function CreateRental() {
                 setOpen(false);
             },
             onError: (errors: any) => {
+                console.log(errors);
                 toast.error(errors.errors);
             },
         });
@@ -68,11 +79,40 @@ export default function CreateRental() {
                             <span className="error">{errors.areaCode}</span>
                         )}
                         <br />
+                        <Select
+                            value={data.carriers}
+                            onValueChange={(value) =>
+                                setData("carriers", value)
+                            }
+                        >
+                            <Label htmlFor="carriers">Carriers</Label>
+
+                            <SelectTrigger id="carriers">
+                                <SelectValue placeholder="Select Carrier" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectGroup>
+                                    <SelectItem value="none">
+                                        Dont use carriers
+                                    </SelectItem>
+                                    <SelectItem value="vz">Verizon</SelectItem>
+                                    <SelectItem value="tmo">
+                                        T-Mobile
+                                    </SelectItem>
+                                </SelectGroup>
+                            </SelectContent>
+                        </Select>
+                        {errors.carriers && (
+                            <span className="error">{errors.carriers}</span>
+                        )}
+                        <br />
                         <DialogFooter>
                             <DialogClose asChild>
                                 <Button variant="outline">Cancel</Button>
                             </DialogClose>
-                            <Button type="submit">Proceed</Button>
+                            <Button type="submit" disabled={processing}>
+                                Proceed
+                            </Button>
                         </DialogFooter>
                     </form>
                 </DialogContent>

@@ -26,6 +26,7 @@ class Sms extends Authenticatable
         'environment_id',
         'rental_id',
         'rental_number',
+        'carrier',
         'service',
         'code',
         'text',

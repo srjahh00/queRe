@@ -26,6 +26,7 @@ interface Sms {
     rental_id: string;
     service: string;
     code: string;
+    carrier: string;
     environment_id: string;
     created_at: string;
 }
@@ -43,7 +44,6 @@ export default function DaisySms({
 }: DaisySmsProps) {
     const [smsList, setSmsList] = useState<Sms[]>(sms);
     const { auth } = usePage().props;
-
     useEffect(() => {
         if (message && message.trim() !== "") {
             // Check for non-null and non-empty message
@@ -120,6 +120,7 @@ export default function DaisySms({
                                 <TableHead className="w-[100px]">
                                     Rental ID
                                 </TableHead>
+                                <TableHead>Carrier</TableHead>
                                 <TableHead>Rental Number</TableHead>
                                 <TableHead>Service</TableHead>
                                 <TableHead>Code</TableHead>
@@ -132,6 +133,9 @@ export default function DaisySms({
                             {smsList.map((message: Sms) => (
                                 <TableRow key={message.rental_id}>
                                     <TableCell>{message.rental_id}</TableCell>
+                                    <TableCell>
+                                        {(message.carrier ?? " ").toUpperCase()}
+                                    </TableCell>
                                     <TableCell>
                                         <span
                                             style={{
