@@ -31,6 +31,8 @@ import { useEffect } from "react";
 import echo from "@/Components/utils/echo";
 import { getPermissions } from "@/Components/utils/permissions";
 import { error } from "console";
+import { DailyStatistic } from "./Partials/DailyStatus";
+import { Separator } from "@/Components/ui/separator";
 interface DashboardProps {
     balance: any;
     users_count: any;
@@ -38,6 +40,7 @@ interface DashboardProps {
     roles: any;
     environments: any;
     sms: any;
+    sms_per_day_environment: any;
 }
 
 export default function Dashboard({
@@ -47,6 +50,7 @@ export default function Dashboard({
     environments,
     roles,
     sms,
+    sms_per_day_environment,
 }: DashboardProps) {
     const userRoles = usePage().props.auth.roles;
     const { hasPermission } = getPermissions(userRoles);
@@ -65,7 +69,6 @@ export default function Dashboard({
         role: "",
         environment_id: "",
     });
-
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value, type, checked } = e.target;
         setData((prevData: any) => ({
@@ -115,7 +118,6 @@ export default function Dashboard({
         });
     };
 
-    console.log(balance);
     return (
         <AuthenticatedLayout
             header={
@@ -134,6 +136,8 @@ export default function Dashboard({
             />
             <br />
 
+            <DailyStatistic sms_per_day_environment={sms_per_day_environment} />
+            <br />
             {hasPermission("manage user") && (
                 <UsersTable
                     users={users}
