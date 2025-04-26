@@ -19,25 +19,36 @@ class DashboardController extends Controller
 
     public function index()
     {
-        $sms = Sms::query()
-        ->whereNotNull('code') 
-        ->where('code', '!=', '') 
-        ->selectRaw("
-            DATE_FORMAT(DATE_SUB(created_at, INTERVAL 5 HOUR), '%Y-%m-%d') as day,
-            environment_id,
-            COUNT(*) as total
-        ")
+        $sms = Sms::whereNotNull('code')
+        ->where('code', '!=', '')
         ->with('environment')
-        ->groupBy('day', 'environment_id')
         ->get()
-        ->groupBy('day')
-        ->map(fn($items, $day) => [
-            'date' => Carbon::parse($day)->format('Y-m-d'),
-            'environments' => $items->map(fn($item) => [
-                'environment' => $item->environment->name ?? 'Unknown',
-                'total' => $item->total,
-            ]),
-        ])
+        ->map(function ($sms) {
+            $adjusted = Carbon::parse($sms->created_at)->subHours(5);
+            return [
+                'day' => $adjusted->format('Y-m-d'),
+                'environment_id' => $sms->environment_id,
+                'environment_name' => $sms->environment->name ?? 'Unknown',
+            ];
+        })
+        ->groupBy(function ($item) {
+            return $item['day'];
+        })
+        ->map(function ($groupedByDay) {
+            return [
+                'date' => $groupedByDay->first()['day'],
+                'environments' => $groupedByDay
+                    ->groupBy('environment_id')
+                    ->map(function ($items) {
+                        return [
+                            'environment' => $items->first()['environment_name'],
+                            'total' => $items->count(),
+                        ];
+                    })
+                    ->values(),
+            ];
+        })
+        ->sortByDesc('date')
         ->values();
     
     
