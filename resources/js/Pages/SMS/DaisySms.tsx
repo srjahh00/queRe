@@ -19,6 +19,8 @@ import CancelRental from "./Partials/CancelRental";
 import echo from "@/Components/utils/echo";
 import { Badge } from "@/Components/ui/badge";
 import { CheckCircle2Icon } from "lucide-react";
+import { Separator } from "@/Components/ui/separator";
+import { format } from "date-fns";
 
 interface Sms {
     id: any;
@@ -35,15 +37,29 @@ interface DaisySmsProps {
     message: any;
     sms: Sms[];
     environmentKeyMissing: any;
+    daily_usage: any;
 }
 
 export default function DaisySms({
     sms,
     message,
     environmentKeyMissing,
+    daily_usage,
 }: DaisySmsProps) {
+    console.log(daily_usage);
     const [smsList, setSmsList] = useState<Sms[]>(sms);
     const { auth } = usePage().props;
+
+    const now = new Date();
+    const today5AM = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        5
+    );
+    const tomorrow5AM = new Date(today5AM);
+    tomorrow5AM.setDate(today5AM.getDate() + 1);
+
     useEffect(() => {
         if (message && message.trim() !== "") {
             // Check for non-null and non-empty message
@@ -103,6 +119,20 @@ export default function DaisySms({
 
             <Card className="w-full p-4">
                 <CardHeader>
+                    <div>
+                        <div className="space-y-1">
+                            <p className="text-sm text-muted-foreground">
+                                {format(today5AM, "yyyy-MM-dd h:mm a")} up to{" "}
+                                {format(tomorrow5AM, "yyyy-MM-dd h:mm a")}
+                            </p>
+                        </div>
+                        <Separator className="my-4" />
+                        <div className="flex h-5 items-center space-x-4 text-sm">
+                            <div>Total Usage</div>
+                            <Separator orientation="vertical" />
+                            <div>{daily_usage}</div>
+                        </div>
+                    </div>
                     {environmentKeyMissing ? (
                         <Badge variant="destructive">No key assigned!</Badge>
                     ) : (

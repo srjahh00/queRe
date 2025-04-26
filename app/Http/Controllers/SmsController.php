@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Sms;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
@@ -23,8 +24,16 @@ class SmsController extends Controller
     {
         $environmentKeyMissing = is_null($this->environment); 
 
+        $start = Carbon::today()->addHours(5); // Today at 5AM
+        $end = Carbon::tomorrow()->addHours(5); // Tomorrow at 5AM
+        
         return Inertia::render('SMS/DaisySms', [
             'sms' => Auth::user()->sms()->orderBy('created_at', 'desc')->get(),
+            'daily_usage' => Auth::user()->sms()
+            ->whereBetween('created_at', [$start, $end])
+            ->whereNotNull('code')
+            ->where('code', '!=', '')
+            ->count(),
             'environmentKeyMissing' => $environmentKeyMissing, 
         ]);
     }
