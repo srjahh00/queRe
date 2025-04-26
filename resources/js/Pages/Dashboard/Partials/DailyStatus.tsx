@@ -15,10 +15,11 @@ import {
     ChartTooltipContent,
 } from "@/Components/ui/chart";
 
+const chartViews = {
+    label: "Total usage today",
+};
+
 const chartConfig = {
-    views: {
-        label: "Total usage today",
-    },
     alessa: {
         label: "Alessa",
         color: "hsl(var(--chart-1))",
@@ -31,31 +32,36 @@ const chartConfig = {
         label: "Linda",
         color: "hsl(var(--chart-3))",
     },
-} satisfies ChartConfig;
+} satisfies Record<string, { label: string; color: string }>;
 
 export function DailyStatistic({
     sms_per_day_environment,
 }: {
     sms_per_day_environment: any;
 }) {
-    console.log(sms_per_day_environment);
     const [activeChart, setActiveChart] =
         React.useState<keyof typeof chartConfig>("alessa");
 
     const chartData = React.useMemo(() => {
-        return sms_per_day_environment.map((item: any) => {
-            const formatted: any = { date: item.date };
+        if (!sms_per_day_environment) return [];
+
+        const formatted = sms_per_day_environment.map((item: any) => {
+            const result: any = { date: item.date };
             item.environments.forEach((env: any) => {
-                formatted[env.environment.toLowerCase()] = env.total;
+                result[env.environment.toLowerCase()] = env.total;
             });
-            return formatted;
+            return result;
         });
+
+        // Sort by date ascending (oldest to newest)
+        return formatted.sort(
+            (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+        );
     }, [sms_per_day_environment]);
 
     const total = React.useMemo(() => {
         const totals = { alessa: 0, emillia: 0, linda: 0 };
         chartData.forEach((item) => {
-            console.log(item);
             totals.alessa += item.alessa ?? 0;
             totals.emillia += item.emillia ?? 0;
             totals.linda += item.linda ?? 0;
@@ -97,7 +103,6 @@ export function DailyStatistic({
                     className="aspect-auto h-[250px] w-full"
                 >
                     <BarChart
-                        accessibilityLayer
                         data={chartData}
                         margin={{
                             left: 12,
@@ -136,20 +141,13 @@ export function DailyStatistic({
                                 />
                             }
                         />
-                        {["alessa", "emillia", "linda"].map((key) => (
-                            <Bar
-                                key={key}
-                                dataKey={key}
-                                stackId="a"
-                                fill={`hsl(var(--chart-${
-                                    key === "alessa"
-                                        ? 1
-                                        : key === "emillia"
-                                        ? 2
-                                        : 3
-                                }))`}
-                            />
-                        ))}
+                        <Bar
+                            dataKey={activeChart}
+                            fill={
+                                chartConfig[activeChart]?.color ??
+                                "hsl(var(--chart-1))"
+                            } // default color fallback
+                        />
                     </BarChart>
                 </ChartContainer>
             </CardContent>
