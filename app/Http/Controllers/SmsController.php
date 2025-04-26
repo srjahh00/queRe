@@ -23,17 +23,27 @@ class SmsController extends Controller
     public function index(Request $request)
     {
         $environmentKeyMissing = is_null($this->environment); 
-
-        $start = Carbon::today()->addHours(5); // Today at 5AM
-        $end = Carbon::tomorrow()->addHours(5); // Tomorrow at 5AM
+    
+        // Get current time
+        $now = Carbon::now();
+        
+        // Set the start to today at 5AM
+        $start = $now->copy()->startOfDay()->addHours(5);
+        
+        // If current time is before 5AM, adjust the range to be yesterday 5AM to today 5AM
+        if ($now->lt($start)) {
+            $start->subDay();
+        }
+        
+        $end = $start->copy()->addDay();
         
         return Inertia::render('SMS/DaisySms', [
             'sms' => Auth::user()->sms()->orderBy('created_at', 'desc')->get(),
             'daily_usage' => Auth::user()->sms()
-            ->whereBetween('created_at', [$start, $end])
-            ->whereNotNull('code')
-            ->where('code', '!=', '')
-            ->count(),
+                ->whereBetween('created_at', [$start, $end])
+                ->whereNotNull('code')
+                ->where('code', '!=', '')
+                ->count(),
             'environmentKeyMissing' => $environmentKeyMissing, 
         ]);
     }
