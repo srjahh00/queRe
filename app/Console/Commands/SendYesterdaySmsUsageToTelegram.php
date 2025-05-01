@@ -68,17 +68,33 @@ class SendYesterdaySmsUsageToTelegram extends Command
     }
     public function sendToTelegram($message)
     {
-        $token = 'bot7750244451:AAGvd1zhTkC3KwWoxuEg6w9LdzlA8AbPTKk';
-        $url = "https://api.telegram.org/{$token}/sendMessage";
+        $botToken = env('TELEGRAM_BOT_TOKEN', '7750244451:AAGvd1zhTkC3KwWoxuEg6w9LdzlA8AbPTKk');
+        $chatId = env('TELEGRAM_CHAT_ID', '-1002481429911');
+        $threadId = env('TELEGRAM_THREAD_ID', '13744');
+
+        $url = "https://api.telegram.org/bot{$botToken}/sendMessage";
 
         try {
-            $response = Http::get($url, [
-                'chat_id' => '-4718270540',
-                'text' => $message
+            $response = Http::post($url, [
+                'chat_id' => $chatId,
+                'message_thread_id' => (int) $threadId,  // Ensure this is integer
+                'text' => $message,
+                'parse_mode' => 'HTML',  // Changed to HTML for better formatting
             ]);
 
+            if ($response->failed()) {
+                \Log::error('Telegram API Error:', [
+                    'status' => $response->status(),
+                    'response' => $response->json()
+                ]);
+                throw new \Exception("Telegram API Error: " . $response->body());
+            }
+
+            return $response->json();
+
         } catch (\Exception $e) {
-            throw new \Exception("Error while sending message: " . $e->getMessage());
+            \Log::error("Telegram Send Error: " . $e->getMessage());
+            throw new \Exception("Failed to send Telegram message: " . $e->getMessage());
         }
     }
 }
