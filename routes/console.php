@@ -1,8 +1,9 @@
 <?php
 
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
+use App\Console\Commands\SendYesterdaySmsUsageToTelegram;
 
-Artisan::command('inspire', function () {
-    $this->comment(Inspiring::quote());
-})->purpose('Display an inspiring quote');
+// For COMMANDS (your SMS usage reporter)
+Schedule::command(SendYesterdaySmsUsageToTelegram::class)
+    ->everyMinute()
+    ->timezone(config('app.timezone', 'Asia/Singapore'));

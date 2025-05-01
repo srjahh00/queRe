@@ -44,7 +44,7 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'allow_login' =>'boolean',
+            'allow_login' => 'boolean',
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
@@ -54,19 +54,34 @@ class User extends Authenticatable
     //     return Carbon::parse($value)->format('M d Y'); 
     // }
 
-    public function environments(){
+    public function environments()
+    {
         return $this->hasOne(EnvironmentAssignment::class);
     }
 
-    public function CurrentEnvironment(){
-        return $this->environment()->only(['name','key']);
+    public function CurrentEnvironment()
+    {
+        return $this->environment()->only(['name', 'key']);
     }
 
-    public function sms(){
+    public function sms()
+    {
         return $this->hasMany(Sms::class);
     }
 
-    public function activeSms(){
+    public function activeSms()
+    {
         return $this->sms()->latest('created_at');
+    }
+
+    // In app/Models/User.php
+    public function today_sms()
+    {
+        return $this->hasMany(Sms::class);
+    }
+
+    public function yesterday_sms()
+    {
+        return $this->hasMany(Sms::class);
     }
 }
