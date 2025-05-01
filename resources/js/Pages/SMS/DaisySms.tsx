@@ -38,6 +38,7 @@ interface DaisySmsProps {
     sms: Sms[];
     environmentKeyMissing: any;
     daily_usage: any;
+    previous_daily_usage:any;
 }
 
 export default function DaisySms({
@@ -45,6 +46,8 @@ export default function DaisySms({
     message,
     environmentKeyMissing,
     daily_usage,
+    previous_daily_usage
+
 }: DaisySmsProps) {
     console.log(daily_usage);
     const [smsList, setSmsList] = useState<Sms[]>(sms);
@@ -59,7 +62,9 @@ export default function DaisySms({
     );
     const tomorrow5AM = new Date(today5AM);
     tomorrow5AM.setDate(today5AM.getDate() + 1);
-
+    const yesterday5AM = new Date(today5AM);
+    yesterday5AM.setDate(today5AM.getDate() - 1);
+    
     useEffect(() => {
         if (message && message.trim() !== "") {
             // Check for non-null and non-empty message
@@ -119,20 +124,35 @@ export default function DaisySms({
 
             <Card className="w-full p-4">
                 <CardHeader>
-                    <div>
-                        <div className="space-y-1">
-                            <p className="text-sm text-muted-foreground">
-                                {format(today5AM, "yyyy-MM-dd h:mm a")} up to{" "}
-                                {format(tomorrow5AM, "yyyy-MM-dd h:mm a")}
-                            </p>
-                        </div>
-                        <Separator className="my-4" />
-                        <div className="flex h-5 items-center space-x-4 text-sm">
-                            <div>Total Usage</div>
-                            <Separator orientation="vertical" />
-                            <div>{daily_usage}</div>
-                        </div>
+                <div>
+                    <div className="space-y-1">
+                        <p className="text-sm text-muted-foreground">
+                            {format(yesterday5AM, "yyyy-MM-dd h:mm a")} up to{" "}
+                            {format(today5AM, "yyyy-MM-dd h:mm a")}
+                        </p>
                     </div>
+                    <Separator className="my-4" />
+                    <div className="flex h-5 items-center space-x-4 text-sm">
+                        <div>Previous Usage</div>
+                        <Separator orientation="vertical" />
+                        <div>{previous_daily_usage}</div>
+                    </div>
+
+                    <Separator className="my-4" />
+                    <div className="space-y-1">
+                        <p className="text-sm text-muted-foreground">
+                            {format(today5AM, "yyyy-MM-dd h:mm a")} up to{" "}
+                            {format(tomorrow5AM, "yyyy-MM-dd h:mm a")}
+                        </p>
+                    </div>
+                    <Separator className="my-4" />
+                    <div className="flex h-5 items-center space-x-4 text-sm">
+                        <div>Current Usage</div>
+                        <Separator orientation="vertical" />
+                        <div>{daily_usage}</div>
+                    </div>
+                </div>
+
                     {environmentKeyMissing ? (
                         <Badge variant="destructive">No key assigned!</Badge>
                     ) : (
