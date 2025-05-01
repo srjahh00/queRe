@@ -23,24 +23,38 @@ class SendYesterdaySmsUsageToTelegram extends Command
         }
         $start = $end->copy()->subDay();
 
-        // Get yesterday's usage for all users
+        // Get all users with their SMS counts
         $users = User::withCount([
             'yesterday_sms' => function ($query) use ($start, $end) {
                 $query->whereBetween('created_at', [$start, $end])
                     ->whereNotNull('code')
                     ->where('code', '!=', '');
             }
-        ])->get();
+        ])
+            ->orderBy('name') // Optional: sort users alphabetically
+            ->get();
 
         // Format the message
         $message = "📊 Yesterday's SMS Usage Report\n";
         $message .= "⏰ Time Period: " . $start->format('Y-m-d H:i') . " to " . $end->format('Y-m-d H:i') . "\n\n";
 
-        $message .= "👥 Total Users: " . $users->count() . "\n";
-        $message .= "📨 Total SMS Sent: " . $users->sum('yesterday_sms_count') . "\n\n";
+        $totalSms = $users->sum('yesterday_sms_count');
+        $activeUsers = $users->where('yesterday_sms_count', '>', 0)->count();
 
-        $message .= "Top Users:\n";
-        $users->filter(fn($user) => $user->yesterday_sms_count > 0)
+        $message .= "👥 Total Users: " . $users->count() . "\n";
+        $message .= "👤 Active Users: " . $activeUsers . "\n";
+        $message .= "📨 Total SMS Sent: " . $totalSms . "\n\n";
+
+        // All users section
+        $message .= "All Users:\n";
+        $users->each(function ($user) use (&$message) {
+            $status = $user->yesterday_sms_count > 0 ? '✅' : '❌';
+            $message .= "{$status} " . $user->name . ": " . $user->yesterday_sms_count . " SMS\n";
+        });
+
+        // Top users section (optional)
+        $message .= "\n🏆 Top Users:\n";
+        $users->where('yesterday_sms_count', '>', 0)
             ->sortByDesc('yesterday_sms_count')
             ->take(10)
             ->each(function ($user) use (&$message) {
@@ -52,7 +66,6 @@ class SendYesterdaySmsUsageToTelegram extends Command
 
         $this->info('Yesterday\'s SMS usage report sent to Telegram!');
     }
-
     public function sendToTelegram($message)
     {
         $token = 'bot7750244451:AAGvd1zhTkC3KwWoxuEg6w9LdzlA8AbPTKk';
