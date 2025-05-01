@@ -12,7 +12,7 @@ use Inertia\Inertia;
 use Log;
 
 class SmsController extends Controller
-{   
+{
     public $environment;
 
     public function __construct(Request $request)
@@ -22,21 +22,25 @@ class SmsController extends Controller
 
     public function index(Request $request)
     {
-        $environmentKeyMissing = is_null($this->environment); 
-    
-        // Get current time
+        $environmentKeyMissing = is_null($this->environment);
+
         $now = Carbon::now();
-        
-        // Set the start to today at 5AM
+
+        // Define "today" as starting at 5 AM
         $start = $now->copy()->startOfDay()->addHours(5);
-        
-        // If current time is before 5AM, adjust the range to be yesterday 5AM to today 5AM
+
+        // Adjust if current time is before 5 AM
         if ($now->lt($start)) {
             $start->subDay();
         }
-        
+
+        // Current day range
         $end = $start->copy()->addDay();
-        
+
+        // Previous day range
+        $prevStart = $start->copy()->subDay();
+        $prevEnd = $start;
+
         return Inertia::render('SMS/DaisySms', [
             'sms' => Auth::user()->sms()->orderBy('created_at', 'desc')->get(),
             'daily_usage' => Auth::user()->sms()
@@ -44,23 +48,29 @@ class SmsController extends Controller
                 ->whereNotNull('code')
                 ->where('code', '!=', '')
                 ->count(),
-            'environmentKeyMissing' => $environmentKeyMissing, 
+            'previous_daily_usage' => Auth::user()->sms()
+                ->whereBetween('created_at', [$prevStart, $prevEnd])
+                ->whereNotNull('code')
+                ->where('code', '!=', '')
+                ->count(),
+            'environmentKeyMissing' => $environmentKeyMissing,
         ]);
     }
 
-    public function getSmsList() {
+    public function getSmsList()
+    {
         return Auth::user()->sms()->orderBy('created_at', 'desc')->get();
     }
-    
+
 
     public function store(Request $request)
-    {  
+    {
 
         $validated = $request->validate([
             'areaCode' => ['required', 'string'],
             'carriers' => ['required', 'string', Rule::in(['vz', 'tmo', 'none'])],
         ]);
-        
+
         $params = [
             'api_key' => $this->environment->key,
             'action' => 'getNumber',
@@ -68,48 +78,49 @@ class SmsController extends Controller
             'max_price' => '0.60',
             'areas' => $validated['areaCode'],
         ];
-        
+
         if ($validated['carriers'] !== 'none') {
             $params['carriers'] = $validated['carriers'];
         }
-        
+
         $response = Http::get("https://daisysms.com/stubs/handler_api.php", $params);
-        
+
         $response = $response->body();
         if (str_contains($response, 'ACCESS_NUMBER:')) {
             $accessNumber = \Str::between($response, 'ACCESS_NUMBER:', ' ') ?? null;
-        
-            $rentalId = \Str::beforeLast($accessNumber, ':');  
-            $rentalNumber = \Str::afterLast($accessNumber, ':');  
-            
+
+            $rentalId = \Str::beforeLast($accessNumber, ':');
+            $rentalNumber = \Str::afterLast($accessNumber, ':');
+
             if ($accessNumber && $rentalId && $rentalNumber) {
                 Sms::create([
                     'user_id' => $request->user()->id,
                     'service' => 'Tinder',
                     'environment_id' => $this->environment->id,
-                    'rental_id' => $rentalId, 
-                    'rental_number' => $rentalNumber,  
-                    'carrier' => data_get($validated,'carriers',null)
+                    'rental_id' => $rentalId,
+                    'rental_number' => $rentalNumber,
+                    'carrier' => data_get($validated, 'carriers', null)
                 ]);
             }
-        }else{
+        } else {
             return back()->withErrors(['errors' => $response]);
-        } 
+        }
     }
 
-    public function cancelRental($id,Request $request){
+    public function cancelRental($id, Request $request)
+    {
         // curl "https://daisysms.com/stubs/handler_api.php?api_key=$APIKEY&action=setStatus&id=308&status=8"
 
         $response = Http::get("https://daisysms.com/stubs/handler_api.php", [
             'api_key' => $this->environment->key,
             'action' => 'setStatus',
-            'id' => data_get($request,'rental_id'),
+            'id' => data_get($request, 'rental_id'),
             'status' => '8',
         ]);
-        $sms = Sms::where('rental_id',data_get($request,'rental_id'));
+        $sms = Sms::where('rental_id', data_get($request, 'rental_id'));
         $sms->delete();
-        
+
         return redirect('/sms')->with('message', $response->body());
 
-    }  
+    }
 }
