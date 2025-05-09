@@ -71,6 +71,11 @@ class SmsController extends Controller
             'carriers' => ['required', 'string', Rule::in(['vz', 'tmo', 'none'])],
         ]);
 
+        // Normalize area codes (even if only one)
+        $areaCodes = array_filter(array_map('trim', explode(',', $validated['areaCode'])));
+        $validated['areaCode'] = implode(',', $areaCodes);
+
+        // Final API params
         $params = [
             'api_key' => $this->environment->key,
             'action' => 'getNumber',
@@ -78,6 +83,7 @@ class SmsController extends Controller
             'max_price' => '0.60',
             'areas' => $validated['areaCode'],
         ];
+
 
         if ($validated['carriers'] !== 'none') {
             $params['carriers'] = $validated['carriers'];
