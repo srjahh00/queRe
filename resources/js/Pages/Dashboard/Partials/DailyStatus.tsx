@@ -20,16 +20,12 @@ const chartViews = {
 };
 
 const chartConfig = {
-    alessa: {
-        label: "Alessa",
+    bella: {
+        label: "Bella",
         color: "hsl(var(--chart-1))",
     },
-    emillia: {
-        label: "Emillia",
-        color: "hsl(var(--chart-2))",
-    },
-    linda: {
-        label: "Linda",
+    brooklyn: {
+        label: "Brooklyn",
         color: "hsl(var(--chart-3))",
     },
 } satisfies Record<string, { label: string; color: string }>;
@@ -40,7 +36,7 @@ export function DailyStatistic({
     sms_per_day_environment: any;
 }) {
     const [activeChart, setActiveChart] =
-        React.useState<keyof typeof chartConfig>("alessa");
+        React.useState<keyof typeof chartConfig>("bella");
 
     const chartData = React.useMemo(() => {
         if (!sms_per_day_environment) return [];
@@ -60,11 +56,10 @@ export function DailyStatistic({
     }, [sms_per_day_environment]);
 
     const total = React.useMemo(() => {
-        const totals = { alessa: 0, emillia: 0, linda: 0 };
+        const totals = { bella: 0, brooklyn: 0 };
         chartData.forEach((item) => {
-            totals.alessa += item.alessa ?? 0;
-            totals.emillia += item.emillia ?? 0;
-            totals.linda += item.linda ?? 0;
+            totals.bella += item.bella ?? 0;
+            totals.brooklyn += item.brooklyn ?? 0;
         });
         return totals;
     }, [chartData]);
@@ -77,7 +72,7 @@ export function DailyStatistic({
                     <CardDescription>Showing daily SMS usage</CardDescription>
                 </div>
                 <div className="flex">
-                    {["alessa", "emillia", "linda"].map((key) => {
+                    {["brooklyn", "bella"].map((key) => {
                         const chart = key as keyof typeof chartConfig;
                         return (
                             <button
