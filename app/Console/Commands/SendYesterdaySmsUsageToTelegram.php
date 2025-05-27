@@ -68,9 +68,9 @@ class SendYesterdaySmsUsageToTelegram extends Command
     }
     public function sendToTelegram($message)
     {
-        $botToken = env('TELEGRAM_BOT_TOKEN', '7750244451:AAGvd1zhTkC3KwWoxuEg6w9LdzlA8AbPTKk');
-        $chatId = env('TELEGRAM_CHAT_ID', '-1002481429911');
-        $threadId = env('TELEGRAM_THREAD_ID', '13744');
+        $botToken = env('TELEGRAM_BOT_TOKEN', '7878382027:AAH2nE6Y__LjgGyt96XWEQCnl78C4RN8rtY');
+        $chatId = env('TELEGRAM_CHAT_ID', '-1002425542459');
+        $threadId = env('TELEGRAM_THREAD_ID', '2763');
 
         $url = "https://api.telegram.org/bot{$botToken}/sendMessage";
 
