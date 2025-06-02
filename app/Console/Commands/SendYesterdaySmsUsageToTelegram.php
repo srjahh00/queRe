@@ -19,67 +19,88 @@ class SendYesterdaySmsUsageToTelegram extends Command
         // Calculate yesterday's range (5 AM to 5 AM)
         $end = $now->copy()->startOfDay()->addHours(5);
         if ($now->lt($end)) {
-            $end->subDay();
+        $end->subDay();
         }
         $start = $end->copy()->subDay();
 
-        // Get all users with their SMS counts
-        $users = User::withCount([
-            'yesterday_sms' => function ($query) use ($start, $end) {
-                $query->whereBetween('created_at', [$start, $end])
-                    ->whereNotNull('code')
-                    ->where('code', '!=', '');
-            }
-        ])
-            ->orderBy('name') // Optional: sort users alphabetically
+        // Get all users with their SMS counts and environments
+        $users = User::with(['environments.environment'])
+            ->withCount([
+                'yesterday_sms' => function ($query) use ($start, $end) {
+                    $query->whereBetween('created_at', [$start, $end])
+                        ->whereNotNull('code')
+                        ->where('code', '!=', '');
+                }
+            ])
+            ->orderBy('name')
             ->get();
 
-        // Format the message
-        $message = "📊 Yesterday's SMS Usage Report\n";
-        $message .= "⏰ Time Period: " . $start->format('Y-m-d H:i') . " to " . $end->format('Y-m-d H:i') . "\n\n";
-
-        $totalSms = $users->sum('yesterday_sms_count');
-        $activeUsers = $users->where('yesterday_sms_count', '>', 0)->count();
-
-        $message .= "👥 Total Users: " . $users->count() . "\n";
-        $message .= "👤 Active Users: " . $activeUsers . "\n";
-        $message .= "📨 Total SMS Sent: " . $totalSms . "\n\n";
-
-        // All users section
-        $message .= "All Users:\n";
-        $users->each(function ($user) use (&$message) {
-            $status = $user->yesterday_sms_count > 0 ? '✅' : '❌';
-            $message .= "{$status} " . $user->name . ": " . $user->yesterday_sms_count . " SMS\n";
+        // Group users by environment
+        $usersByEnvironment = $users->groupBy(function ($user) {
+            return $user->environments->environment->name ?? 'unknown';
         });
 
-        // Top users section (optional)
-        $message .= "\n🏆 Top Users:\n";
-        $users->where('yesterday_sms_count', '>', 0)
-            ->sortByDesc('yesterday_sms_count')
-            ->take(10)
-            ->each(function ($user) use (&$message) {
-                $message .= "👤 " . $user->name . ": " . $user->yesterday_sms_count . " SMS\n";
+        // Telegram configuration for different environments
+        $telegramConfig = [
+            'bella' => [
+                'chat_id' => env('TELEGRAM_BELLA_CHAT_ID', '-1002425542459'),
+                'thread_id' => env('TELEGRAM_BELLA_THREAD_ID', '2763'),
+            ],
+            'brooklyn' => [
+                'chat_id' => env('TELEGRAM_BROOKLYN_CHAT_ID', '-1002174516181'),
+                'thread_id' => env('TELEGRAM_BROOKLYN_THREAD_ID', '3'),
+            ],
+          
+        ];
+
+        // Send report for each environment
+        foreach ($usersByEnvironment as $envName => $envUsers) {
+            $message = "📊 Yesterday's SMS Usage Report for {$envName}\n";
+            $message .= "⏰ Time Period: " . $start->format('Y-m-d H:i') . " to " . $end->format('Y-m-d H:i') . "\n\n";
+
+            $totalSms = $envUsers->sum('yesterday_sms_count');
+            $activeUsers = $envUsers->where('yesterday_sms_count', '>', 0)->count();
+
+            $message .= "👥 Total Users: " . $envUsers->count() . "\n";
+            $message .= "👤 Active Users: " . $activeUsers . "\n";
+            $message .= "📨 Total SMS Sent: " . $totalSms . "\n\n";
+
+            // All users section
+            $message .= "All Users:\n";
+            $envUsers->each(function ($user) use (&$message) {
+                $status = $user->yesterday_sms_count > 0 ? '✅' : '❌';
+                $message .= "{$status} " . $user->name . ": " . $user->yesterday_sms_count . " SMS\n";
             });
 
-        // Send to Telegram
-        $this->sendToTelegram($message);
+            // Top users section
+            $message .= "\n🏆 Top Users:\n";
+            $envUsers->where('yesterday_sms_count', '>', 0)
+                ->sortByDesc('yesterday_sms_count')
+                ->take(10)
+                ->each(function ($user) use (&$message) {
+                    $message .= "👤 " . $user->name . ": " . $user->yesterday_sms_count . " SMS\n";
+                });
 
-        $this->info('Yesterday\'s SMS usage report sent to Telegram!');
+            // Send to appropriate Telegram thread
+            $config = $telegramConfig[strtolower($envName)] ;
+            $this->sendToTelegram($message, $config['chat_id'], $config['thread_id']);
+        }
+
+        $this->info('Yesterday\'s SMS usage reports sent to Telegram!');
     }
-    public function sendToTelegram($message)
+
+    public function sendToTelegram($message, $chatId, $threadId)
     {
         $botToken = env('TELEGRAM_BOT_TOKEN', '7878382027:AAH2nE6Y__LjgGyt96XWEQCnl78C4RN8rtY');
-        $chatId = env('TELEGRAM_CHAT_ID', '-1002425542459');
-        $threadId = env('TELEGRAM_THREAD_ID', '2763');
 
         $url = "https://api.telegram.org/bot{$botToken}/sendMessage";
 
         try {
             $response = Http::post($url, [
                 'chat_id' => $chatId,
-                'message_thread_id' => (int) $threadId,  // Ensure this is integer
+                'message_thread_id' => (int) $threadId,
                 'text' => $message,
-                'parse_mode' => 'HTML',  // Changed to HTML for better formatting
+                'parse_mode' => 'HTML',
             ]);
 
             if ($response->failed()) {
